@@ -1,4 +1,6 @@
-﻿using OllamaSharp;
+﻿using Microsoft.Agents.AI;
+using Microsoft.Extensions.AI;
+using OllamaSharp;
 
 var agentMarkdownPath = Path.Combine("Agents", "code-reviewer.md");
 var codePath = Path.Combine("Agents", "code.txt");
@@ -14,5 +16,22 @@ var httpClient = new HttpClient(handler)
 
 var ollamaClient = new OllamaApiClient(httpClient);
 
-var instructions = File.ReadAllBytes(agentMarkdownPath);
-var code = File.ReadAllBytes(codePath);
+var instructions = File.ReadAllText(agentMarkdownPath);
+var code = File.ReadAllText(codePath);
+
+var codeReviewAgent = ollamaClient.AsAIAgent(
+    new ChatClientAgentOptions
+    {
+        Name = "CodeReviewerAgent",
+        Description = "Agente especialista em revisão de código C# .NET",
+        ChatOptions = new ChatOptions
+        {
+            ModelId = model,
+            Temperature = 0.7f,
+            Instructions = instructions
+        }
+    }
+);
+
+var result = await codeReviewAgent.RunAsync(code);
+Console.WriteLine(result);
