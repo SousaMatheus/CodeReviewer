@@ -33,5 +33,5 @@ var codeReviewAgent = ollamaClient.AsAIAgent(
     }
 );
 
-var result = await codeReviewAgent.RunAsync(code);
-Console.WriteLine(result);
+await foreach (var token in codeReviewAgent.RunStreamingAsync(code))
+    Console.Write(token);
